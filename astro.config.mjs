@@ -1,11 +1,10 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// GitHub Pages "project page" URL: https://xussof.github.io/xussof-site/
-// If a custom domain is added later, set `site` to it and `base` to '/'.
+// Served from the custom domain xussof.com (see public/CNAME).
+// base defaults to '/' since the site lives at the domain root.
 export default defineConfig({
-  site: 'https://xussof.github.io',
-  base: '/xussof-site',
+  site: 'https://xussof.com',
   trailingSlash: 'always',
   i18n: {
     defaultLocale: 'es',
