@@ -19,7 +19,7 @@ export const ui = {
 
     'about.kicker': 'Sobre mí',
     'about.heading': 'Quién soy',
-    'about.body': 'Soy <b>xussof</b>. Diseño y construyo productos de principio a fin: pienso el problema, lo prototipo y lo lanzo. Me mueve hacer cosas <b>útiles, cuidadas y con personalidad</b>. Ahora mismo, entre la IA aplicada y la web interactiva.',
+    'about.body': 'Soy <b>Sergi</b>. Diseño y construyo productos de principio a fin: pienso el problema, lo prototipo y lo lanzo. Me mueve hacer cosas <b>útiles, cuidadas y con personalidad</b>. Ahora mismo, entre la IA aplicada y la web interactiva.',
 
     'projects.kicker': 'Proyectos',
     'projects.heading': 'En lo que trabajo',
@@ -57,7 +57,7 @@ export const ui = {
 
     'about.kicker': 'About',
     'about.heading': 'Who I am',
-    'about.body': "I'm <b>xussof</b>. I design and build products end to end: I frame the problem, prototype it and ship it. I'm driven by making things that are <b>useful, polished and full of character</b>. Right now, somewhere between applied AI and interactive web.",
+    'about.body': "I'm <b>Sergi</b>. I design and build products end to end: I frame the problem, prototype it and ship it. I'm driven by making things that are <b>useful, polished and full of character</b>. Right now, somewhere between applied AI and interactive web.",
 
     'projects.kicker': 'Projects',
     'projects.heading': 'What I work on',
