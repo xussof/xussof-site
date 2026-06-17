@@ -20,7 +20,7 @@ img { max-width: 100%; display: block; }
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
 .sec { padding: 56px 0; }
 .sec-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 28px; }
-.sec-h .k {
+.sec-h .kicker {
   font-size: 13px; font-weight: 800; letter-spacing: .12em;
   text-transform: uppercase; color: var(--pink);
 }
@@ -43,7 +43,7 @@ img { max-width: 100%; display: block; }
 .prose a { color: var(--pink-sh); text-decoration: underline; }
 .prose code {
   font-family: ui-monospace, monospace; font-size: .9em;
-  background: #fff; border: 1px solid var(--card-border);
+  background: var(--code-bg); border: 1px solid var(--card-border);
   padding: 1px 6px; border-radius: 6px;
 }
 
