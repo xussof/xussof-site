@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import NoteCard from '../../../components/NoteCard.astro';
+import { useTranslations } from '../../../i18n/utils';
+
+const lang = 'en' as const;
+const t = useTranslations(lang);
+const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<BaseLayout title={t('meta.blogTitle')} description={t('meta.blogDesc')} lang={lang} route="blog/">
+  <div class="wrap sec">
+    <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
+    {posts.length === 0
+      ? <p class="muted">{t('blog.empty')}</p>
+      : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} />)}</div>}
+  </div>
+</BaseLayout>
