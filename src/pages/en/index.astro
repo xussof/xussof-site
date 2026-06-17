@@ -13,7 +13,7 @@ const t = useTranslations(lang);
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || a.id.localeCompare(b.id))
   .slice(0, 3);
 ---
 <BaseLayout title={t('meta.homeTitle')} description={t('meta.homeDesc')} lang={lang} route="">

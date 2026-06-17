@@ -12,13 +12,15 @@ interface Props {
   description: string;
   lang: Lang;
   route: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
 }
-const { title, description, lang, route } = Astro.props;
+const { title, description, lang, route, type, publishedTime } = Astro.props;
 ---
 <!doctype html>
 <html lang={lang}>
   <head>
-    <SEO title={title} description={description} lang={lang} route={route} />
+    <SEO title={title} description={description} lang={lang} route={route} type={type} publishedTime={publishedTime} />
   </head>
   <body>
     <Nav lang={lang} route={route} />

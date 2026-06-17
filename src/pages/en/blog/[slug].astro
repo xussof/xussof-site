@@ -24,6 +24,8 @@ const home = getRelativeLocaleUrl(lang, '');
   description={post.data.description}
   lang={lang}
   route={`blog/${slug}/`}
+  type="article"
+  publishedTime={post.data.pubDate.toISOString()}
 >
   <article class="wrap sec post">
     <a class="back" href={home}>← {t('blog.backHome')}</a>

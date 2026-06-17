@@ -243,7 +243,7 @@ img { max-width: 100%; display: block; }
   font-size: 13px; font-weight: 800; letter-spacing: .12em;
   text-transform: uppercase; color: var(--pink);
 }
-.sec-h h2 {
+.sec-h h1, .sec-h h2 {
   font-family: var(--font-display); font-weight: 900;
   font-size: 34px; letter-spacing: -.02em;
 }
@@ -268,7 +268,7 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 760px) {
   .pcards, .notes { grid-template-columns: 1fr; }
-  .sec-h h2 { font-size: 28px; }
+  .sec-h h1, .sec-h h2 { font-size: 28px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -626,8 +626,10 @@ interface Props {
   description: string;
   lang: Lang;
   route: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
 }
-const { title, description, lang, route } = Astro.props;
+const { title, description, lang, route, type = 'website', publishedTime } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(`${import.meta.env.BASE_URL}og-image.svg`, Astro.site);
@@ -645,7 +647,8 @@ const enUrl = getAbsoluteLocaleUrl('en', route);
 <link rel="alternate" hreflang="en" href={enUrl} />
 <link rel="alternate" hreflang="x-default" href={esUrl} />
 
-<meta property="og:type" content="website" />
+<meta property="og:type" content={type} />
+{publishedTime && <meta property="article:published_time" content={publishedTime} />}
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
@@ -675,13 +678,15 @@ interface Props {
   description: string;
   lang: Lang;
   route: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
 }
-const { title, description, lang, route } = Astro.props;
+const { title, description, lang, route, type, publishedTime } = Astro.props;
 ---
 <!doctype html>
 <html lang={lang}>
   <head>
-    <SEO title={title} description={description} lang={lang} route={route} />
+    <SEO title={title} description={description} lang={lang} route={route} type={type} publishedTime={publishedTime} />
   </head>
   <body>
     <Nav lang={lang} route={route} />
@@ -1144,7 +1149,7 @@ const t = useTranslations(lang);
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || a.id.localeCompare(b.id))
   .slice(0, 3);
 ---
 <BaseLayout title={t('meta.homeTitle')} description={t('meta.homeDesc')} lang={lang} route="">
@@ -1194,7 +1199,7 @@ const t = useTranslations(lang);
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || a.id.localeCompare(b.id))
   .slice(0, 3);
 ---
 <BaseLayout title={t('meta.homeTitle')} description={t('meta.homeDesc')} lang={lang} route="">
@@ -1264,11 +1269,11 @@ import { useTranslations } from '../../i18n/utils';
 const lang = 'es' as const;
 const t = useTranslations(lang);
 const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || a.id.localeCompare(b.id));
 ---
 <BaseLayout title={t('meta.blogTitle')} description={t('meta.blogDesc')} lang={lang} route="blog/">
   <div class="wrap sec">
-    <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
+    <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h1>{t('blog.heading')}</h1></div>
     {posts.length === 0
       ? <p class="muted">{t('blog.empty')}</p>
       : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} />)}</div>}
@@ -1288,11 +1293,11 @@ import { useTranslations } from '../../../i18n/utils';
 const lang = 'en' as const;
 const t = useTranslations(lang);
 const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || a.id.localeCompare(b.id));
 ---
 <BaseLayout title={t('meta.blogTitle')} description={t('meta.blogDesc')} lang={lang} route="blog/">
   <div class="wrap sec">
-    <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
+    <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h1>{t('blog.heading')}</h1></div>
     {posts.length === 0
       ? <p class="muted">{t('blog.empty')}</p>
       : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} />)}</div>}
@@ -1348,6 +1353,8 @@ const home = getRelativeLocaleUrl(lang, '');
   description={post.data.description}
   lang={lang}
   route={`blog/${slug}/`}
+  type="article"
+  publishedTime={post.data.pubDate.toISOString()}
 >
   <article class="wrap sec post">
     <a class="back" href={home}>← {t('blog.backHome')}</a>
@@ -1394,6 +1401,8 @@ const home = getRelativeLocaleUrl(lang, '');
   description={post.data.description}
   lang={lang}
   route={`blog/${slug}/`}
+  type="article"
+  publishedTime={post.data.pubDate.toISOString()}
 >
   <article class="wrap sec post">
     <a class="back" href={home}>← {t('blog.backHome')}</a>
