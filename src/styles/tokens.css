@@ -1,0 +1,22 @@
+:root {
+  /* Palette — Warm Playful Pop */
+  --bg: #fff7ef;
+  --ink: #2a221b;
+  --muted: #6b5d4f;
+  --card-border: #f0e6d8;
+  --card-shadow: #f4eadb;
+
+  --pink: #ff5d8f;   --pink-sh: #d63e6e;
+  --yellow: #ffd166; --yellow-sh: #eec476;
+  --blue: #c6e7ff;   --blue-sh: #9cccef;
+  --green: #bdebc4;  --green-sh: #97d6a1;
+
+  /* Typography */
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+
+  /* Radii & layout */
+  --radius-card: 22px;
+  --radius-pill: 999px;
+  --maxw: 1080px;
+}
