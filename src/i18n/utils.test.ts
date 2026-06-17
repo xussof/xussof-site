@@ -8,8 +8,8 @@ describe('useTranslations', () => {
     expect(useTranslations('en')('nav.projects')).toBe('Projects');
   });
 
-  it('falls back to the default language when a key is missing', () => {
-    // @ts-expect-error — exercising the runtime fallback with an unknown key
+  it('returns undefined for a completely unknown key', () => {
+    // @ts-expect-error — key is absent from every dictionary
     expect(useTranslations('en')('totally.unknown.key')).toBeUndefined();
   });
 });
