@@ -1,0 +1,29 @@
+---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+<div class="about">
+  <div class="ava" aria-hidden="true">👋</div>
+  <p set:html={t('about.body')} />
+</div>
+
+<style>
+  .about {
+    background: #fff; border: 1px solid var(--card-border);
+    border-radius: 24px; padding: 34px;
+    display: flex; gap: 28px; align-items: center;
+    box-shadow: 0 10px 0 var(--card-shadow);
+  }
+  .ava {
+    width: 84px; height: 84px; border-radius: 22px; flex: none;
+    display: grid; place-items: center; font-size: 34px;
+    background: linear-gradient(135deg, var(--blue), var(--pink));
+  }
+  .about p { font-size: 16px; color: var(--muted); font-weight: 500; }
+  .about p :global(b) { color: var(--ink); }
+  @media (max-width: 760px) { .about { flex-direction: column; text-align: center; } }
+</style>
