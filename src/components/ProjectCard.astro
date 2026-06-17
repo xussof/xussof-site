@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  lang: Lang;
+}
+const { project, lang } = Astro.props;
+const { title, url, accent, emoji, tags, summary } = project.data;
+const host = new URL(url).hostname.replace(/^www\./, '');
+---
+<a class:list={['pcard', accent]} href={url} target="_blank" rel="noopener noreferrer">
+  <div class="emoji" aria-hidden="true">{emoji}</div>
+  <h3>{title}</h3>
+  <p>{summary[lang]}</p>
+  <div class="row">
+    {tags.map((tag) => <span class="tag">{tag}</span>)}
+    <span class="visit">{host} →</span>
+  </div>
+</a>
+
+<style>
+  .pcard {
+    display: block; border-radius: var(--radius-card); padding: 26px;
+    position: relative; overflow: hidden; color: var(--ink);
+    box-shadow: 0 10px 0 rgba(0,0,0,.07);
+    transition: transform .15s ease;
+  }
+  .pcard:hover { transform: translateY(-3px); }
+  .pcard.blue   { background: var(--blue);   box-shadow: 0 10px 0 var(--blue-sh); }
+  .pcard.yellow { background: var(--yellow); box-shadow: 0 10px 0 var(--yellow-sh); }
+  .pcard.pink   { background: var(--pink);   box-shadow: 0 10px 0 var(--pink-sh); color: #fff; }
+  .pcard.green  { background: var(--green);  box-shadow: 0 10px 0 var(--green-sh); }
+  .emoji { font-size: 34px; }
+  .pcard h3 { font-weight: 800; font-size: 24px; margin: 14px 0 8px; letter-spacing: -.01em; }
+  .pcard p { font-size: 14px; color: #5b4f43; font-weight: 500; max-width: 42ch; }
+  .pcard.pink p { color: #ffe9f0; }
+  .row { display: flex; align-items: center; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .tag { font-size: 12px; font-weight: 700; background: rgba(0,0,0,.10); padding: 5px 12px; border-radius: var(--radius-pill); }
+  .visit { margin-left: auto; font-weight: 800; font-size: 14px; }
+</style>
