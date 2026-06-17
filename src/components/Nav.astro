@@ -1,0 +1,46 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import LangToggle from './LangToggle.astro';
+
+interface Props {
+  lang: Lang;
+  route?: string;
+}
+const { lang, route = '' } = Astro.props;
+const t = useTranslations(lang);
+const home = getRelativeLocaleUrl(lang, '');
+const blog = getRelativeLocaleUrl(lang, 'blog/');
+---
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href={home}><b>xus</b>sof</a>
+    <nav>
+      <a class="hide" href={`${home}#proyectos`}>{t('nav.projects')}</a>
+      <a class="hide" href={`${home}#sobre-mi`}>{t('nav.about')}</a>
+      <a class="hide" href={blog}>{t('nav.blog')}</a>
+      <LangToggle lang={lang} route={route} />
+      <a class="nav-cta" href={`${home}#contacto`}>{t('nav.contact')}</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .nav-in { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+  .brand { font-weight: 800; font-size: 20px; }
+  .brand b { background: var(--ink); color: var(--bg); padding: 2px 8px; border-radius: 8px; }
+  nav { display: flex; align-items: center; gap: 22px; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .nav-cta {
+    background: var(--pink); color: #fff; padding: 9px 16px;
+    border-radius: var(--radius-pill); font-weight: 700;
+    box-shadow: 0 5px 0 var(--pink-sh);
+  }
+  @media (max-width: 760px) { nav .hide { display: none; } }
+</style>

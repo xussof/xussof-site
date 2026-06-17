@@ -1,0 +1,34 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { languages, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  route?: string;
+}
+const { lang, route = '' } = Astro.props;
+const codes = Object.keys(languages) as Lang[];
+---
+<div class="lang">
+  {codes.map((code) => (
+    <a
+      class:list={['lang-opt', { on: code === lang }]}
+      href={getRelativeLocaleUrl(code, route)}
+      hreflang={code}
+      aria-current={code === lang ? 'true' : undefined}
+    >{code.toUpperCase()}</a>
+  ))}
+</div>
+
+<style>
+  .lang {
+    display: inline-flex;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .lang-opt { padding: 4px 10px; color: var(--ink); }
+  .lang-opt.on { background: var(--ink); color: var(--bg); }
+</style>
