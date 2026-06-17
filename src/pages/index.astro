@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import NoteCard from '../components/NoteCard.astro';
+import ContactCTA from '../components/ContactCTA.astro';
+import { useTranslations } from '../i18n/utils';
+
+const lang = 'es' as const;
+const t = useTranslations(lang);
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+---
+<BaseLayout title={t('meta.homeTitle')} description={t('meta.homeDesc')} lang={lang} route="">
+  <Hero lang={lang} />
+  <div class="wrap">
+    <section id="sobre-mi" class="sec">
+      <div class="sec-h"><span class="kicker">{t('about.kicker')}</span><h2>{t('about.heading')}</h2></div>
+      <About lang={lang} />
+    </section>
+
+    <section id="proyectos" class="sec">
+      <div class="sec-h"><span class="kicker">{t('projects.kicker')}</span><h2>{t('projects.heading')}</h2></div>
+      <div class="pcards">
+        {projects.map((p) => <ProjectCard project={p} lang={lang} />)}
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
+      <div class="notes">
+        {posts.map((p) => <NoteCard post={p} lang={lang} />)}
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section id="contacto"><ContactCTA lang={lang} /></section>
+  </div>
+</BaseLayout>
