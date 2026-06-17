@@ -5,7 +5,7 @@ import type { Lang } from '../i18n/ui';
 interface Props { lang: Lang; }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const year = 2026;
+const year = new Date().getFullYear();
 ---
 <footer class="foot">
   <div class="wrap">© {year} xussof · {t('footer.madeWith')} · ES / EN</div>

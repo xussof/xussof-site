@@ -11,9 +11,9 @@ interface Props {
   title: string;
   description: string;
   lang: Lang;
-  route?: string;
+  route: string;
 }
-const { title, description, lang, route = '' } = Astro.props;
+const { title, description, lang, route } = Astro.props;
 ---
 <!doctype html>
 <html lang={lang}>

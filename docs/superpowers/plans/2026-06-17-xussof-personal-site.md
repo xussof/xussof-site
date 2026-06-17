@@ -122,7 +122,15 @@ Expected: installs succeed; `astro`, `@astrojs/sitemap`, the two `@fontsource-va
 
 ```ts
 /// <reference types="astro/client" />
+
+// @fontsource-variable packages ship CSS only (no type declarations);
+// declare them so the side-effect imports in BaseLayout type-check under
+// strict + bundler module resolution.
+declare module '@fontsource-variable/fraunces';
+declare module '@fontsource-variable/plus-jakarta-sans';
 ```
+
+> Note: the two `declare module` lines may be added now or when `BaseLayout` first imports the fonts (Task 5) — either way they must exist before `astro check` will pass once the font imports are present.
 
 - [ ] **Step 5: Create `astro.config.mjs`**
 
@@ -186,6 +194,7 @@ git commit -m "chore: scaffold Astro project with i18n, sitemap and vitest"
   --muted: #6b5d4f;
   --card-border: #f0e6d8;
   --card-shadow: #f4eadb;
+  --code-bg: #fff;
 
   --pink: #ff5d8f;   --pink-sh: #d63e6e;
   --yellow: #ffd166; --yellow-sh: #eec476;
@@ -228,7 +237,7 @@ img { max-width: 100%; display: block; }
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
 .sec { padding: 56px 0; }
 .sec-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 28px; }
-.sec-h .k {
+.sec-h .kicker {
   font-size: 13px; font-weight: 800; letter-spacing: .12em;
   text-transform: uppercase; color: var(--pink);
 }
@@ -251,7 +260,7 @@ img { max-width: 100%; display: block; }
 .prose a { color: var(--pink-sh); text-decoration: underline; }
 .prose code {
   font-family: ui-monospace, monospace; font-size: .9em;
-  background: #fff; border: 1px solid var(--card-border);
+  background: var(--code-bg); border: 1px solid var(--card-border);
   padding: 1px 6px; border-radius: 6px;
 }
 
@@ -395,8 +404,8 @@ describe('useTranslations', () => {
     expect(useTranslations('en')('nav.projects')).toBe('Projects');
   });
 
-  it('falls back to the default language when a key is missing', () => {
-    // @ts-expect-error — exercising the runtime fallback with an unknown key
+  it('returns undefined for a completely unknown key', () => {
+    // @ts-expect-error — key is absent from every dictionary
     expect(useTranslations('en')('totally.unknown.key')).toBeUndefined();
   });
 });
@@ -483,7 +492,7 @@ const projects = defineCollection({
   loader: glob({ pattern: '**/[^_]*.md', base: './src/content/projects' }),
   schema: z.object({
     title: z.string(),
-    url: z.string().url(),
+    url: z.url(),
     order: z.number(),
     accent: z.enum(['blue', 'yellow', 'pink', 'green']),
     emoji: z.string(),
@@ -614,9 +623,9 @@ interface Props {
   title: string;
   description: string;
   lang: Lang;
-  route?: string;
+  route: string;
 }
-const { title, description, lang, route = '' } = Astro.props;
+const { title, description, lang, route } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(`${import.meta.env.BASE_URL}og-image.svg`, Astro.site);
@@ -663,9 +672,9 @@ interface Props {
   title: string;
   description: string;
   lang: Lang;
-  route?: string;
+  route: string;
 }
-const { title, description, lang, route = '' } = Astro.props;
+const { title, description, lang, route } = Astro.props;
 ---
 <!doctype html>
 <html lang={lang}>
@@ -718,7 +727,7 @@ const codes = Object.keys(languages) as Lang[];
       class:list={['lang-opt', { on: code === lang }]}
       href={getRelativeLocaleUrl(code, route)}
       hreflang={code}
-      aria-current={code === lang ? 'true' : undefined}
+      aria-current={code === lang ? 'page' : undefined}
     >{code.toUpperCase()}</a>
   ))}
 </div>
@@ -771,6 +780,7 @@ const blog = getRelativeLocaleUrl(lang, 'blog/');
 <style>
   .nav {
     position: sticky; top: 0; z-index: 10;
+    background: rgba(255, 247, 239, 0.85);
     background: color-mix(in srgb, var(--bg) 85%, transparent);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--card-border);
@@ -1087,7 +1097,7 @@ import type { Lang } from '../i18n/ui';
 interface Props { lang: Lang; }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const year = 2026;
+const year = new Date().getFullYear();
 ---
 <footer class="foot">
   <div class="wrap">© {year} xussof · {t('footer.madeWith')} · ES / EN</div>
@@ -1098,7 +1108,7 @@ const year = 2026;
 </style>
 ```
 
-> Note: the year is a static literal because Astro scripts here must stay deterministic and SSG output is rebuilt on each deploy. Bump it when needed, or replace with `new Date().getFullYear()` only inside a server/build context if you prefer auto-updating.
+> Note: the year is computed at build time with `new Date().getFullYear()` and self-updates on each deploy — no manual bump required.
 
 - [ ] **Step 3: Commit**
 
@@ -1139,19 +1149,19 @@ const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.dat
   <Hero lang={lang} />
   <div class="wrap">
     <section id="sobre-mi" class="sec">
-      <div class="sec-h"><span class="k">{t('about.kicker')}</span><h2>{t('about.heading')}</h2></div>
+      <div class="sec-h"><span class="kicker">{t('about.kicker')}</span><h2>{t('about.heading')}</h2></div>
       <About lang={lang} />
     </section>
 
     <section id="proyectos" class="sec">
-      <div class="sec-h"><span class="k">{t('projects.kicker')}</span><h2>{t('projects.heading')}</h2></div>
+      <div class="sec-h"><span class="kicker">{t('projects.kicker')}</span><h2>{t('projects.heading')}</h2></div>
       <div class="pcards">
         {projects.map((p) => <ProjectCard project={p} lang={lang} />)}
       </div>
     </section>
 
     <section class="sec">
-      <div class="sec-h"><span class="k">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
+      <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
       <div class="notes">
         {posts.map((p) => <NoteCard post={p} lang={lang} />)}
       </div>
@@ -1189,19 +1199,19 @@ const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.dat
   <Hero lang={lang} />
   <div class="wrap">
     <section id="sobre-mi" class="sec">
-      <div class="sec-h"><span class="k">{t('about.kicker')}</span><h2>{t('about.heading')}</h2></div>
+      <div class="sec-h"><span class="kicker">{t('about.kicker')}</span><h2>{t('about.heading')}</h2></div>
       <About lang={lang} />
     </section>
 
     <section id="proyectos" class="sec">
-      <div class="sec-h"><span class="k">{t('projects.kicker')}</span><h2>{t('projects.heading')}</h2></div>
+      <div class="sec-h"><span class="kicker">{t('projects.kicker')}</span><h2>{t('projects.heading')}</h2></div>
       <div class="pcards">
         {projects.map((p) => <ProjectCard project={p} lang={lang} />)}
       </div>
     </section>
 
     <section class="sec">
-      <div class="sec-h"><span class="k">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
+      <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
       <div class="notes">
         {posts.map((p) => <NoteCard post={p} lang={lang} />)}
       </div>
@@ -1256,7 +1266,7 @@ const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.dat
 ---
 <BaseLayout title={t('meta.blogTitle')} description={t('meta.blogDesc')} lang={lang} route="blog/">
   <div class="wrap sec">
-    <div class="sec-h"><span class="k">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
+    <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
     {posts.length === 0
       ? <p class="muted">{t('blog.empty')}</p>
       : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} />)}</div>}
@@ -1280,7 +1290,7 @@ const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.dat
 ---
 <BaseLayout title={t('meta.blogTitle')} description={t('meta.blogDesc')} lang={lang} route="blog/">
   <div class="wrap sec">
-    <div class="sec-h"><span class="k">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
+    <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h2>{t('blog.heading')}</h2></div>
     {posts.length === 0
       ? <p class="muted">{t('blog.empty')}</p>
       : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} />)}</div>}

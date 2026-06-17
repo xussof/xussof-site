@@ -15,7 +15,7 @@ const codes = Object.keys(languages) as Lang[];
       class:list={['lang-opt', { on: code === lang }]}
       href={getRelativeLocaleUrl(code, route)}
       hreflang={code}
-      aria-current={code === lang ? 'true' : undefined}
+      aria-current={code === lang ? 'page' : undefined}
     >{code.toUpperCase()}</a>
   ))}
 </div>
