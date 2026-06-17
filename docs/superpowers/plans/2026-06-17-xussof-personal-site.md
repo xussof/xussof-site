@@ -68,7 +68,8 @@ xussof-site/
 │           └─ [slug].astro          # EN post (Task 14)
 ├─ public/
 │  ├─ favicon.svg                    # (Task 15)
-│  ├─ og-image.svg                   # (Task 15)
+│  ├─ og-image.svg                   # (Task 15) design source
+│  ├─ og-image.png                   # (Task 15) generated 1200×630 PNG — rendered via sharp from og-image.svg
 │  └─ robots.txt                     # (Task 15)
 └─ .github/workflows/deploy.yml      # (Task 16)
 ```
@@ -632,7 +633,7 @@ interface Props {
 const { title, description, lang, route, type = 'website', publishedTime } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL(`${import.meta.env.BASE_URL}og-image.svg`, Astro.site);
+const ogImage = new URL(`${import.meta.env.BASE_URL}og-image.png`, Astro.site);
 const esUrl = getAbsoluteLocaleUrl('es', route);
 const enUrl = getAbsoluteLocaleUrl('en', route);
 ---
@@ -1442,7 +1443,9 @@ git commit -m "feat: add blog post pages with shared-slug language pairing"
 ## Task 15: Public assets (favicon, OG image, robots)
 
 **Files:**
-- Create: `public/favicon.svg`, `public/og-image.svg`, `public/robots.txt`
+- Create: `public/favicon.svg`, `public/og-image.svg`, `public/og-image.png` (generated), `public/robots.txt`
+
+> **Enhancement:** Social crawlers (LinkedIn, Facebook, X/Twitter) do not render SVG og:images. `og-image.svg` is kept as the design source, but a 1200×630 PNG is rendered from it via `sharp` and is the file actually referenced in `SEO.astro`.
 
 - [ ] **Step 1: Create `public/favicon.svg`**
 
@@ -1454,7 +1457,7 @@ git commit -m "feat: add blog post pages with shared-slug language pairing"
 </svg>
 ```
 
-- [ ] **Step 2: Create `public/og-image.svg` (1200×630 social preview)**
+- [ ] **Step 2: Create `public/og-image.svg` (1200×630 design source)**
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
@@ -1467,7 +1470,33 @@ git commit -m "feat: add blog post pages with shared-slug language pairing"
 </svg>
 ```
 
-> The SVG OG image is a lightweight placeholder. Some platforms prefer PNG/JPG for social cards; replacing `og-image.svg` with a rendered `og-image.png` (and updating the two references in `SEO.astro`) is a documented future nicety.
+- [ ] **Step 2b: Render `public/og-image.png` from the SVG using sharp**
+
+Sharp ships with Astro; verify it is importable, and if not, run `npm install -D sharp`. Then generate the PNG:
+
+```bash
+node --input-type=module -e "import sharp from 'sharp'; import {readFileSync} from 'node:fs'; const svg=readFileSync('public/og-image.svg'); await sharp(svg,{density:150}).resize(1200,630).png().toFile('public/og-image.png'); console.log('og-image.png generated');"
+```
+
+Verify it is valid and exactly 1200×630:
+
+```bash
+node --input-type=module -e "import sharp from 'sharp'; const m=await sharp('public/og-image.png').metadata(); console.log(m.format, m.width, m.height);"
+```
+
+Expected: `png 1200 630`. If sharp errors or the PNG is not produced, STOP and report BLOCKED — do NOT leave a dangling reference in `SEO.astro`.
+
+- [ ] **Step 2c: Update `src/components/SEO.astro` to reference `og-image.png`**
+
+Change:
+```ts
+const ogImage = new URL(`${import.meta.env.BASE_URL}og-image.svg`, Astro.site);
+```
+to:
+```ts
+const ogImage = new URL(`${import.meta.env.BASE_URL}og-image.png`, Astro.site);
+```
+Both `og:image` and `twitter:image` use this constant, so one change covers both.
 
 - [ ] **Step 3: Create `public/robots.txt`**
 
@@ -1481,13 +1510,13 @@ Sitemap: https://xussof.github.io/xussof-site/sitemap-index.xml
 - [ ] **Step 4: Verify assets are served and referenced**
 
 Run: `npm run build`
-Expected: `dist/favicon.svg`, `dist/og-image.svg`, `dist/robots.txt` and `dist/sitemap-index.xml` all exist. Open `dist/index.html` and confirm the `<link rel="icon">` and `og:image` point at `/xussof-site/favicon.svg` and `/xussof-site/og-image.svg`.
+Expected: `dist/favicon.svg`, `dist/og-image.svg`, `dist/og-image.png`, `dist/robots.txt` and `dist/sitemap-index.xml` all exist. Open `dist/index.html` and confirm the `<link rel="icon">` points at `/xussof-site/favicon.svg` and `og:image` / `twitter:image` point at `/xussof-site/og-image.png`.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add public/
-git commit -m "feat: add favicon, OG image and robots.txt"
+git add public/ src/components/SEO.astro
+git commit -m "feat: add favicon, robots, and rendered PNG OpenGraph image"
 ```
 
 ---
