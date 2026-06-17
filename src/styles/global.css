@@ -24,7 +24,7 @@ img { max-width: 100%; display: block; }
 .sec-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 28px; }
 .sec-h .kicker {
   font-size: 13px; font-weight: 800; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--pink);
+  text-transform: uppercase; color: var(--pink-text);
 }
 .sec-h h1, .sec-h h2 {
   font-family: var(--font-display); font-weight: 900;

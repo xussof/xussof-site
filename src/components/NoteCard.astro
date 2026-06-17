@@ -7,14 +7,16 @@ import type { Lang } from '../i18n/ui';
 interface Props {
   post: CollectionEntry<'blog'>;
   lang: Lang;
+  headingLevel?: 'h2' | 'h3';
 }
-const { post, lang } = Astro.props;
+const { post, lang, headingLevel = 'h3' } = Astro.props;
 const slug = post.id.split('/').pop()!;
 const href = getRelativeLocaleUrl(lang, `blog/${slug}/`);
+const Heading = headingLevel;
 ---
 <a class="ncard" href={href}>
   <div class="date">{formatDate(post.data.pubDate, lang)}</div>
-  <h3>{post.data.title}</h3>
+  <Heading>{post.data.title}</Heading>
   <p>{post.data.description}</p>
 </a>
 
@@ -25,7 +27,7 @@ const href = getRelativeLocaleUrl(lang, `blog/${slug}/`);
     transition: transform .15s ease;
   }
   .ncard:hover { transform: translateY(-3px); }
-  .date { font-size: 12px; font-weight: 700; color: var(--pink); text-transform: uppercase; letter-spacing: .08em; }
-  .ncard h3 { font-size: 17px; font-weight: 700; margin: 8px 0 6px; line-height: 1.25; }
+  .date { font-size: 12px; font-weight: 700; color: var(--pink-text); text-transform: uppercase; letter-spacing: .08em; }
+  .ncard h2, .ncard h3 { font-size: 17px; font-weight: 700; margin: 8px 0 6px; line-height: 1.25; }
   .ncard p { font-size: 13px; color: var(--muted); font-weight: 500; }
 </style>

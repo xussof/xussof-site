@@ -201,6 +201,7 @@ git commit -m "chore: scaffold Astro project with i18n, sitemap and vitest"
   --code-bg: #fff;
 
   --pink: #ff5d8f;   --pink-sh: #d63e6e;
+  --pink-text: #c0285a;   /* darker rose: AA-contrast pink for small text on cream */
   --yellow: #ffd166; --yellow-sh: #eec476;
   --blue: #c6e7ff;   --blue-sh: #9cccef;
   --green: #bdebc4;  --green-sh: #97d6a1;
@@ -245,7 +246,7 @@ img { max-width: 100%; display: block; }
 .sec-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 28px; }
 .sec-h .kicker {
   font-size: 13px; font-weight: 800; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--pink);
+  text-transform: uppercase; color: var(--pink-text);
 }
 .sec-h h1, .sec-h h2 {
   font-family: var(--font-display); font-weight: 900;
@@ -447,8 +448,6 @@ Expected: FAIL — `Failed to resolve import "./utils"` / `useTranslations is no
 
 ```ts
 import { ui, defaultLang, type Lang, type UIKey } from './ui';
-
-export type { Lang } from './ui';
 
 /** Returns a translator `t(key)` for the given language, falling back to the default language. */
 export function useTranslations(lang: Lang) {
@@ -801,7 +800,7 @@ const blog = getRelativeLocaleUrl(lang, 'blog/');
   .brand b { background: var(--ink); color: var(--bg); padding: 2px 8px; border-radius: 8px; }
   nav { display: flex; align-items: center; gap: 22px; font-size: 14px; font-weight: 600; color: var(--muted); }
   .nav-cta {
-    background: var(--pink); color: #fff; padding: 9px 16px;
+    background: var(--pink); color: var(--ink); padding: 9px 16px;
     border-radius: var(--radius-pill); font-weight: 700;
     box-shadow: 0 5px 0 var(--pink-sh);
   }
@@ -1021,14 +1020,16 @@ import type { Lang } from '../i18n/ui';
 interface Props {
   post: CollectionEntry<'blog'>;
   lang: Lang;
+  headingLevel?: 'h2' | 'h3';
 }
-const { post, lang } = Astro.props;
+const { post, lang, headingLevel = 'h3' } = Astro.props;
 const slug = post.id.split('/').pop()!;
 const href = getRelativeLocaleUrl(lang, `blog/${slug}/`);
+const Heading = headingLevel;
 ---
 <a class="ncard" href={href}>
   <div class="date">{formatDate(post.data.pubDate, lang)}</div>
-  <h3>{post.data.title}</h3>
+  <Heading>{post.data.title}</Heading>
   <p>{post.data.description}</p>
 </a>
 
@@ -1039,8 +1040,8 @@ const href = getRelativeLocaleUrl(lang, `blog/${slug}/`);
     transition: transform .15s ease;
   }
   .ncard:hover { transform: translateY(-3px); }
-  .date { font-size: 12px; font-weight: 700; color: var(--pink); text-transform: uppercase; letter-spacing: .08em; }
-  .ncard h3 { font-size: 17px; font-weight: 700; margin: 8px 0 6px; line-height: 1.25; }
+  .date { font-size: 12px; font-weight: 700; color: var(--pink-text); text-transform: uppercase; letter-spacing: .08em; }
+  .ncard h2, .ncard h3 { font-size: 17px; font-weight: 700; margin: 8px 0 6px; line-height: 1.25; }
   .ncard p { font-size: 13px; color: var(--muted); font-weight: 500; }
 </style>
 ```
@@ -1115,7 +1116,7 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
-  .foot { text-align: center; color: #a99a8a; font-size: 13px; font-weight: 500; padding: 0 0 50px; }
+  .foot { text-align: center; color: var(--muted); font-size: 13px; font-weight: 500; padding: 0 0 50px; }
 </style>
 ```
 
@@ -1280,7 +1281,7 @@ const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.dat
     <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h1>{t('blog.heading')}</h1></div>
     {posts.length === 0
       ? <p class="muted">{t('blog.empty')}</p>
-      : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} />)}</div>}
+      : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} headingLevel="h2" />)}</div>}
   </div>
 </BaseLayout>
 ```
@@ -1304,7 +1305,7 @@ const posts = (await getCollection('blog', (p) => p.data.lang === lang && !p.dat
     <div class="sec-h"><span class="kicker">{t('blog.kicker')}</span><h1>{t('blog.heading')}</h1></div>
     {posts.length === 0
       ? <p class="muted">{t('blog.empty')}</p>
-      : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} />)}</div>}
+      : <div class="notes">{posts.map((p) => <NoteCard post={p} lang={lang} headingLevel="h2" />)}</div>}
   </div>
 </BaseLayout>
 ```
@@ -1371,7 +1372,7 @@ const home = getRelativeLocaleUrl(lang, '');
 <style>
   .post { max-width: 760px; }
   .back { display: inline-block; margin-bottom: 18px; font-weight: 700; color: var(--pink-sh); }
-  .post .date { font-size: 13px; font-weight: 700; color: var(--pink); text-transform: uppercase; letter-spacing: .08em; }
+  .post .date { font-size: 13px; font-weight: 700; color: var(--pink-text); text-transform: uppercase; letter-spacing: .08em; }
   .post h1 { font-family: var(--font-display); font-weight: 900; font-size: 40px; letter-spacing: -.02em; margin: 8px 0 24px; line-height: 1.08; }
 </style>
 ```
@@ -1419,7 +1420,7 @@ const home = getRelativeLocaleUrl(lang, '');
 <style>
   .post { max-width: 760px; }
   .back { display: inline-block; margin-bottom: 18px; font-weight: 700; color: var(--pink-sh); }
-  .post .date { font-size: 13px; font-weight: 700; color: var(--pink); text-transform: uppercase; letter-spacing: .08em; }
+  .post .date { font-size: 13px; font-weight: 700; color: var(--pink-text); text-transform: uppercase; letter-spacing: .08em; }
   .post h1 { font-family: var(--font-display); font-weight: 900; font-size: 40px; letter-spacing: -.02em; margin: 8px 0 24px; line-height: 1.08; }
 </style>
 ```

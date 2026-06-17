@@ -1,7 +1,5 @@
 import { ui, defaultLang, type Lang, type UIKey } from './ui';
 
-export type { Lang } from './ui';
-
 /** Returns a translator `t(key)` for the given language, falling back to the default language. */
 export function useTranslations(lang: Lang) {
   return function t(key: UIKey): string {

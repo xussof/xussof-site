@@ -8,6 +8,7 @@
   --code-bg: #fff;
 
   --pink: #ff5d8f;   --pink-sh: #d63e6e;
+  --pink-text: #c0285a;   /* darker rose: AA-contrast pink for small text on cream */
   --yellow: #ffd166; --yellow-sh: #eec476;
   --blue: #c6e7ff;   --blue-sh: #9cccef;
   --green: #bdebc4;  --green-sh: #97d6a1;
