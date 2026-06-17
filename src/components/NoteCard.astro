@@ -14,7 +14,7 @@ const href = getRelativeLocaleUrl(lang, `blog/${slug}/`);
 ---
 <a class="ncard" href={href}>
   <div class="date">{formatDate(post.data.pubDate, lang)}</div>
-  <h4>{post.data.title}</h4>
+  <h3>{post.data.title}</h3>
   <p>{post.data.description}</p>
 </a>
 
@@ -26,6 +26,6 @@ const href = getRelativeLocaleUrl(lang, `blog/${slug}/`);
   }
   .ncard:hover { transform: translateY(-3px); }
   .date { font-size: 12px; font-weight: 700; color: var(--pink); text-transform: uppercase; letter-spacing: .08em; }
-  .ncard h4 { font-size: 17px; font-weight: 700; margin: 8px 0 6px; line-height: 1.25; }
+  .ncard h3 { font-size: 17px; font-weight: 700; margin: 8px 0 6px; line-height: 1.25; }
   .ncard p { font-size: 13px; color: var(--muted); font-weight: 500; }
 </style>

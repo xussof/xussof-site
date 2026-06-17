@@ -10,7 +10,7 @@ const t = useTranslations(lang);
   <h2>{t('contact.heading')}</h2>
   <p>{t('contact.body')}</p>
   <div class="links">
-    <a class="pink" href={contactLinks.email}>✉️ {t('contact.email')}</a>
+    <a class="pink" href={contactLinks.email}><span aria-hidden="true">✉️</span> {t('contact.email')}</a>
     <a href={contactLinks.linkedin} target="_blank" rel="noopener noreferrer">{t('contact.linkedin')}</a>
     <a href={contactLinks.github} target="_blank" rel="noopener noreferrer">{t('contact.github')}</a>
     <a href={contactLinks.x} target="_blank" rel="noopener noreferrer">{t('contact.x')}</a>
@@ -29,6 +29,6 @@ const t = useTranslations(lang);
     background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
     padding: 11px 20px; border-radius: var(--radius-pill); font-weight: 700; font-size: 14px;
   }
-  .links a.pink { background: var(--pink); border-color: var(--pink); box-shadow: 0 5px 0 var(--pink-sh); }
+  .links a.pink { background: var(--pink); border-color: var(--pink); box-shadow: 0 5px 0 var(--pink-sh); color: var(--ink); }
   @media (max-width: 760px) { .contact { padding: 34px 24px; } .contact h2 { font-size: 30px; } }
 </style>

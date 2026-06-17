@@ -233,6 +233,8 @@ body {
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
+:focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+
 /* Layout utilities (used by pages) */
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
 .sec { padding: 56px 0; }
@@ -972,12 +974,12 @@ const host = new URL(url).hostname.replace(/^www\./, '');
   .pcard:hover { transform: translateY(-3px); }
   .pcard.blue   { background: var(--blue);   box-shadow: 0 10px 0 var(--blue-sh); }
   .pcard.yellow { background: var(--yellow); box-shadow: 0 10px 0 var(--yellow-sh); }
-  .pcard.pink   { background: var(--pink);   box-shadow: 0 10px 0 var(--pink-sh); color: #fff; }
+  .pcard.pink   { background: var(--pink);   box-shadow: 0 10px 0 var(--pink-sh); color: var(--ink); }
   .pcard.green  { background: var(--green);  box-shadow: 0 10px 0 var(--green-sh); }
   .emoji { font-size: 34px; }
   .pcard h3 { font-weight: 800; font-size: 24px; margin: 14px 0 8px; letter-spacing: -.01em; }
   .pcard p { font-size: 14px; color: #5b4f43; font-weight: 500; max-width: 42ch; }
-  .pcard.pink p { color: #ffe9f0; }
+  .pcard.pink p { color: var(--ink); }
   .row { display: flex; align-items: center; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
   .tag { font-size: 12px; font-weight: 700; background: rgba(0,0,0,.10); padding: 5px 12px; border-radius: var(--radius-pill); }
   .visit { margin-left: auto; font-weight: 800; font-size: 14px; }
@@ -1017,7 +1019,7 @@ const href = getRelativeLocaleUrl(lang, `blog/${slug}/`);
 ---
 <a class="ncard" href={href}>
   <div class="date">{formatDate(post.data.pubDate, lang)}</div>
-  <h4>{post.data.title}</h4>
+  <h3>{post.data.title}</h3>
   <p>{post.data.description}</p>
 </a>
 
@@ -1029,7 +1031,7 @@ const href = getRelativeLocaleUrl(lang, `blog/${slug}/`);
   }
   .ncard:hover { transform: translateY(-3px); }
   .date { font-size: 12px; font-weight: 700; color: var(--pink); text-transform: uppercase; letter-spacing: .08em; }
-  .ncard h4 { font-size: 17px; font-weight: 700; margin: 8px 0 6px; line-height: 1.25; }
+  .ncard h3 { font-size: 17px; font-weight: 700; margin: 8px 0 6px; line-height: 1.25; }
   .ncard p { font-size: 13px; color: var(--muted); font-weight: 500; }
 </style>
 ```
@@ -1063,7 +1065,7 @@ const t = useTranslations(lang);
   <h2>{t('contact.heading')}</h2>
   <p>{t('contact.body')}</p>
   <div class="links">
-    <a class="pink" href={contactLinks.email}>✉️ {t('contact.email')}</a>
+    <a class="pink" href={contactLinks.email}><span aria-hidden="true">✉️</span> {t('contact.email')}</a>
     <a href={contactLinks.linkedin} target="_blank" rel="noopener noreferrer">{t('contact.linkedin')}</a>
     <a href={contactLinks.github} target="_blank" rel="noopener noreferrer">{t('contact.github')}</a>
     <a href={contactLinks.x} target="_blank" rel="noopener noreferrer">{t('contact.x')}</a>
@@ -1082,7 +1084,7 @@ const t = useTranslations(lang);
     background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
     padding: 11px 20px; border-radius: var(--radius-pill); font-weight: 700; font-size: 14px;
   }
-  .links a.pink { background: var(--pink); border-color: var(--pink); box-shadow: 0 5px 0 var(--pink-sh); }
+  .links a.pink { background: var(--pink); border-color: var(--pink); box-shadow: 0 5px 0 var(--pink-sh); color: var(--ink); }
   @media (max-width: 760px) { .contact { padding: 34px 24px; } .contact h2 { font-size: 30px; } }
 </style>
 ```
