@@ -27,6 +27,8 @@ xussof-site/
 ├─ tsconfig.json                     # strict TS (Task 1)
 ├─ astro.config.mjs                  # site/base, i18n, sitemap (Task 1)
 ├─ vitest.config.ts                  # unit test config (Task 1)
+├─ scripts/
+│  └─ generate-og.mjs               # (Task 15) regenerates public/og-image.png from SVG via sharp
 ├─ src/
 │  ├─ env.d.ts                       # Astro types ref (Task 1)
 │  ├─ styles/
@@ -58,6 +60,7 @@ xussof-site/
 │  │  └─ BaseLayout.astro            # (Task 5)
 │  └─ pages/
 │     ├─ index.astro                 # ES home (Task 12)
+│     ├─ robots.txt.ts               # (Task 15) dynamic robots.txt endpoint — Sitemap URL derived from site+base
 │     ├─ blog/
 │     │  ├─ index.astro              # ES blog index (Task 13)
 │     │  └─ [slug].astro             # ES post (Task 14)
@@ -69,8 +72,7 @@ xussof-site/
 ├─ public/
 │  ├─ favicon.svg                    # (Task 15)
 │  ├─ og-image.svg                   # (Task 15) design source
-│  ├─ og-image.png                   # (Task 15) generated 1200×630 PNG — rendered via sharp from og-image.svg
-│  └─ robots.txt                     # (Task 15)
+│  └─ og-image.png                   # (Task 15) generated 1200×630 PNG — run `npm run generate:og` to regenerate
 └─ .github/workflows/deploy.yml      # (Task 16)
 ```
 
@@ -95,7 +97,8 @@ xussof-site/
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "generate:og": "node scripts/generate-og.mjs"
   }
 }
 ```
@@ -105,9 +108,9 @@ xussof-site/
 Run:
 ```bash
 npm install astro @astrojs/sitemap @fontsource-variable/fraunces @fontsource-variable/plus-jakarta-sans
-npm install -D vitest @astrojs/check typescript
+npm install -D vitest @astrojs/check typescript sharp
 ```
-Expected: installs succeed; `astro`, `@astrojs/sitemap`, the two `@fontsource-variable/*` packages land in `dependencies`, and `vitest`/`@astrojs/check`/`typescript` in `devDependencies`.
+Expected: installs succeed; `astro`, `@astrojs/sitemap`, the two `@fontsource-variable/*` packages land in `dependencies`, and `vitest`/`@astrojs/check`/`typescript`/`sharp` in `devDependencies`.
 
 - [ ] **Step 3: Create `tsconfig.json`**
 
@@ -1443,9 +1446,11 @@ git commit -m "feat: add blog post pages with shared-slug language pairing"
 ## Task 15: Public assets (favicon, OG image, robots)
 
 **Files:**
-- Create: `public/favicon.svg`, `public/og-image.svg`, `public/og-image.png` (generated), `public/robots.txt`
+- Create: `public/favicon.svg`, `public/og-image.svg`, `public/og-image.png` (generated), `scripts/generate-og.mjs`, `src/pages/robots.txt.ts`
 
 > **Enhancement:** Social crawlers (LinkedIn, Facebook, X/Twitter) do not render SVG og:images. `og-image.svg` is kept as the design source, but a 1200×630 PNG is rendered from it via `sharp` and is the file actually referenced in `SEO.astro`.
+>
+> `robots.txt` is served as a dynamic Astro endpoint (`src/pages/robots.txt.ts`) so the `Sitemap:` URL is always derived from the configured `site` + `base` — it stays correct across domain or base-path changes without manual edits.
 
 - [ ] **Step 1: Create `public/favicon.svg`**
 
@@ -1470,12 +1475,38 @@ git commit -m "feat: add blog post pages with shared-slug language pairing"
 </svg>
 ```
 
-- [ ] **Step 2b: Render `public/og-image.png` from the SVG using sharp**
+- [ ] **Step 2b: Add `sharp` devDep and create `scripts/generate-og.mjs`**
 
-Sharp ships with Astro; verify it is importable, and if not, run `npm install -D sharp`. Then generate the PNG:
+`sharp` must be an explicit `devDependency` (not just a transitive dep). Run:
 
 ```bash
-node --input-type=module -e "import sharp from 'sharp'; import {readFileSync} from 'node:fs'; const svg=readFileSync('public/og-image.svg'); await sharp(svg,{density:150}).resize(1200,630).png().toFile('public/og-image.png'); console.log('og-image.png generated');"
+npm install -D sharp
+```
+
+Create `scripts/generate-og.mjs`:
+
+```js
+import sharp from 'sharp';
+import { readFileSync } from 'node:fs';
+
+const svg = readFileSync('public/og-image.svg');
+await sharp(svg, { density: 150 })
+  .resize(1200, 630)
+  .png()
+  .toFile('public/og-image.png');
+console.log('Generated public/og-image.png (1200x630)');
+```
+
+Add the script entry to `package.json` `scripts`:
+
+```json
+"generate:og": "node scripts/generate-og.mjs"
+```
+
+Then generate the PNG:
+
+```bash
+npm run generate:og
 ```
 
 Verify it is valid and exactly 1200×630:
@@ -1498,25 +1529,34 @@ const ogImage = new URL(`${import.meta.env.BASE_URL}og-image.png`, Astro.site);
 ```
 Both `og:image` and `twitter:image` use this constant, so one change covers both.
 
-- [ ] **Step 3: Create `public/robots.txt`**
+- [ ] **Step 3: Create `src/pages/robots.txt.ts` (dynamic endpoint)**
 
-```text
-User-agent: *
+Instead of a static `public/robots.txt`, serve it as an Astro API endpoint so the `Sitemap:` URL is always derived from the live `site` + `base` config:
+
+```ts
+import type { APIRoute } from 'astro';
+
+export const GET: APIRoute = ({ site }) => {
+  const sitemapURL = new URL(`${import.meta.env.BASE_URL}sitemap-index.xml`, site);
+  const body = `User-agent: *
 Allow: /
 
-Sitemap: https://xussof.github.io/xussof-site/sitemap-index.xml
+Sitemap: ${sitemapURL.href}
+`;
+  return new Response(body, { headers: { 'Content-Type': 'text/plain' } });
+};
 ```
 
 - [ ] **Step 4: Verify assets are served and referenced**
 
 Run: `npm run build`
-Expected: `dist/favicon.svg`, `dist/og-image.svg`, `dist/og-image.png`, `dist/robots.txt` and `dist/sitemap-index.xml` all exist. Open `dist/index.html` and confirm the `<link rel="icon">` points at `/xussof-site/favicon.svg` and `og:image` / `twitter:image` point at `/xussof-site/og-image.png`.
+Expected: `dist/favicon.svg`, `dist/og-image.svg`, `dist/og-image.png`, `dist/robots.txt` (generated from the endpoint) and `dist/sitemap-index.xml` all exist. Open `dist/index.html` and confirm the `<link rel="icon">` points at `/xussof-site/favicon.svg` and `og:image` / `twitter:image` point at `/xussof-site/og-image.png`. Open `dist/robots.txt` and confirm `Sitemap: https://xussof.github.io/xussof-site/sitemap-index.xml`.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add public/ src/components/SEO.astro
-git commit -m "feat: add favicon, robots, and rendered PNG OpenGraph image"
+git add public/ scripts/ src/pages/robots.txt.ts src/components/SEO.astro
+git commit -m "feat: add favicon, robots endpoint, generate:og script, and rendered PNG OpenGraph image"
 ```
 
 ---
@@ -1538,10 +1578,8 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
-# Allow one concurrent deployment; skip queued runs in between.
+# One deployment at a time; never cancel an in-progress Pages deploy.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -1558,6 +1596,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -1638,6 +1679,7 @@ npm run dev      # http://localhost:4321/xussof-site/
 - **Projects:** add a Markdown file in `src/content/projects/` (see the schema in `src/content.config.ts`).
 - **Blog:** add a post as a language pair sharing the same filename/slug:
   `src/content/blog/es/<slug>.md` and `src/content/blog/en/<slug>.md`.
+- **OG image:** `public/og-image.png` is generated from `public/og-image.svg`; after editing the SVG run `npm run generate:og`.
 
 ## Deploy
 

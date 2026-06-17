@@ -25,6 +25,7 @@ npm run dev      # http://localhost:4321/xussof-site/
 - **Projects:** add a Markdown file in `src/content/projects/` (see the schema in `src/content.config.ts`).
 - **Blog:** add a post as a language pair sharing the same filename/slug:
   `src/content/blog/es/<slug>.md` and `src/content/blog/en/<slug>.md`.
+- **OG image:** `public/og-image.png` is generated from `public/og-image.svg`; after editing the SVG run `npm run generate:og`.
 
 ## Deploy
 
