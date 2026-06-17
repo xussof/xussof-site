@@ -1,0 +1,12 @@
+# Visual brainstorming companion (local only)
+.superpowers/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log
+
+# Dependencies / build output (filled in once stack is chosen)
+node_modules/
+dist/
+.cache/
