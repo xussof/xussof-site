@@ -1,0 +1,41 @@
+---
+import { getCollection, render } from 'astro:content';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { useTranslations, formatDate } from '../../i18n/utils';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', (p) => p.data.lang === 'es' && !p.data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id.split('/').pop()! },
+    props: { post },
+  }));
+}
+
+const lang = 'es' as const;
+const t = useTranslations(lang);
+const { post } = Astro.props;
+const slug = post.id.split('/').pop()!;
+const { Content } = await render(post);
+const home = getRelativeLocaleUrl(lang, '');
+---
+<BaseLayout
+  title={`${post.data.title} · xussof`}
+  description={post.data.description}
+  lang={lang}
+  route={`blog/${slug}/`}
+>
+  <article class="wrap sec post">
+    <a class="back" href={home}>← {t('blog.backHome')}</a>
+    <p class="date">{formatDate(post.data.pubDate, lang)}</p>
+    <h1>{post.data.title}</h1>
+    <div class="prose"><Content /></div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post { max-width: 760px; }
+  .back { display: inline-block; margin-bottom: 18px; font-weight: 700; color: var(--pink-sh); }
+  .post .date { font-size: 13px; font-weight: 700; color: var(--pink); text-transform: uppercase; letter-spacing: .08em; }
+  .post h1 { font-family: var(--font-display); font-weight: 900; font-size: 40px; letter-spacing: -.02em; margin: 8px 0 24px; line-height: 1.08; }
+</style>
