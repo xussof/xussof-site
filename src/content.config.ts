@@ -6,7 +6,7 @@ const projects = defineCollection({
   loader: glob({ pattern: '**/[^_]*.md', base: './src/content/projects' }),
   schema: z.object({
     title: z.string(),
-    url: z.string().url(),
+    url: z.url(),
     order: z.number(),
     accent: z.enum(['blue', 'yellow', 'pink', 'green']),
     emoji: z.string(),
