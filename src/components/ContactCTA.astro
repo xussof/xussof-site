@@ -1,0 +1,34 @@
+---
+import { useTranslations } from '../i18n/utils';
+import { contactLinks, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+<div class="contact">
+  <h2>{t('contact.heading')}</h2>
+  <p>{t('contact.body')}</p>
+  <div class="links">
+    <a class="pink" href={contactLinks.email}>✉️ {t('contact.email')}</a>
+    <a href={contactLinks.linkedin} target="_blank" rel="noopener noreferrer">{t('contact.linkedin')}</a>
+    <a href={contactLinks.github} target="_blank" rel="noopener noreferrer">{t('contact.github')}</a>
+    <a href={contactLinks.x} target="_blank" rel="noopener noreferrer">{t('contact.x')}</a>
+  </div>
+</div>
+
+<style>
+  .contact {
+    background: var(--ink); color: var(--bg);
+    border-radius: 28px; padding: 48px; text-align: center; margin-bottom: 40px;
+  }
+  .contact h2 { font-family: var(--font-display); font-weight: 900; font-size: 40px; letter-spacing: -.02em; margin-bottom: 10px; }
+  .contact p { color: #d9cdbf; font-weight: 500; margin-bottom: 24px; }
+  .links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .links a {
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
+    padding: 11px 20px; border-radius: var(--radius-pill); font-weight: 700; font-size: 14px;
+  }
+  .links a.pink { background: var(--pink); border-color: var(--pink); box-shadow: 0 5px 0 var(--pink-sh); }
+  @media (max-width: 760px) { .contact { padding: 34px 24px; } .contact h2 { font-size: 30px; } }
+</style>
